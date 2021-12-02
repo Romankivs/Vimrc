@@ -1,1 +1,1 @@
-nvim-init
+Nvim-init
