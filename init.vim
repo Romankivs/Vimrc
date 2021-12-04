@@ -1,54 +1,3 @@
-let g:vimspector_enable_mappings='HUMAN'
-
-call plug#begin('~/.vim/plugged')
-
-" Make sure you use single quotes
- Plug 'junegunn/vim-easy-align'
- Plug 'navarasu/onedark.nvim'
- Plug 'nvim-lualine/lualine.nvim'
- Plug 'nvim-lua/plenary.nvim' | Plug 'nvim-telescope/telescope.nvim'
- Plug 'kyazdani42/nvim-web-devicons' 
- Plug 'kyazdani42/nvim-tree.lua'
- Plug 'akinsho/bufferline.nvim'
- Plug 'liuchengxu/vim-which-key'
- Plug 'mhinz/vim-startify'
- Plug 'itchyny/vim-gitbranch'
-
-" Group dependencies, vim-snippets depends on ultisnips
-" Plug 'SirVer/ultisnips' | Plug 'honza/vim-snippets'
-
-" On-demand loading
-" Plug 'neoclide/coc.nvim', {'branch': 'release'} 
-" Using git URL
- Plug 'https://github.com/puremourning/vimspector.git'
-" Plug 'https://github.com/honza/vim-snippets.git'
-" Plug 'https://github.com/neoclide/coc-snippets.git'
- Plug 'https://github.com/cdelledonne/vim-cmake.git'
-" Plugin options
- Plug 'nsf/gocode', { 'tag': 'v.20150303', 'rtp': 'vim' }
-
-" Plugin outside ~/.vim/plugged with post-update hook
- Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': 'yes \| ./install' }
- Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
-" Unmanaged plugin (manually installed and updated)
-
-call plug#end()
-
-let g:dashboard_default_executive ='telescope'
-
-set termguicolors
-
-let g:onedark_toggle_style_keymap = '<leader>tc'
-set number
-
-let g:python3_host_prog = '/usr/bin/python3' " -------- Set python 3 provider
-
-let g:python_host_prog = '/usr/bin/python' " ---------- Set python 2 provider
-
-set updatetime=300
-
-let mapleader="\<Space>"
-
 nnoremap <silent> <leader> :WhichKey '<Space>'<CR>
 
 " telescope
@@ -95,12 +44,44 @@ set expandtab       " Expand TABs to spaces.g
 lua << EOF
 local use = require('packer').use
 require('packer').startup(function()
-  use 'neovim/nvim-lspconfig' -- Collection of configurations for built-in LSP client
-  use 'hrsh7th/nvim-cmp' -- Autocompletion plugin
-  use 'hrsh7th/cmp-nvim-lsp' -- LSP source for nvim-cmp
-  use 'saadparwaiz1/cmp_luasnip' -- Snippets source for nvim-cmp
-  use 'L3MON4D3/LuaSnip' -- Snippets plugin
+   use 'junegunn/fzf.vim'
+   use 'junegunn/vim-easy-align'
+   use 'navarasu/onedark.nvim'
+   use 'nvim-lualine/lualine.nvim'
+   use 'nvim-lua/plenary.nvim'
+   use 'nvim-telescope/telescope.nvim'
+   use 'kyazdani42/nvim-web-devicons' 
+   use 'kyazdani42/nvim-tree.lua'
+   use 'akinsho/bufferline.nvim'
+   use 'liuchengxu/vim-which-key'
+   use 'mhinz/vim-startify'
+   use 'itchyny/vim-gitbranch'
+   use 'puremourning/vimspector'
+   use {
+       'nvim-treesitter/nvim-treesitter',
+       run = ':TSUpdate'
+       }
+   use 'neovim/nvim-lspconfig' -- Collection of configurations for built-in LSP client
+   use 'hrsh7th/nvim-cmp' -- Autocompletion plugin
+   use 'hrsh7th/cmp-nvim-lsp' -- LSP source for nvim-cmp
+   use 'saadparwaiz1/cmp_luasnip' -- Snippets source for nvim-cmp
+   use 'L3MON4D3/LuaSnip' -- Snippets plugin
+   use 'cdelledonne/vim-cmake'
 end)
+
+vim.o.termguicolors = true
+vim.o.number = true -- Print line numbers
+vim.o.updatetime = 300
+
+vim.g.mapleader = ' '
+
+vim.g.python3_host_prog = '/usr/bin/python3' -- Set python 3 provider
+
+vim.g.python_host_prog = '/usr/bin/python' -- Set python 2 provider
+
+vim.g.onedark_toggle_style_keymap = '<leader>tc'
+
+vim.g.vimspector_enable_mappings = 'HUMAN'
 
 -- Add additional capabilities supported by nvim-cmp
 local capabilities = vim.lsp.protocol.make_client_capabilities()
@@ -109,7 +90,7 @@ capabilities = require('cmp_nvim_lsp').update_capabilities(capabilities)
 local lspconfig = require('lspconfig')
 
 -- Enable some language servers with the additional completion capabilities offered by nvim-cmp
-local servers = { 'clangd', 'hls', 'vimls', 'cmake', }
+local servers = { 'clangd', 'hls', 'cmake', 'sumneko_lua', 'html', 'bashls', 'vimls' }
 for _, lsp in ipairs(servers) do
   lspconfig[lsp].setup {
     -- on_attach = my_custom_on_attach,
