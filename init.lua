@@ -1,56 +1,12 @@
-nnoremap <silent> <leader> :WhichKey '<Space>'<CR>
-
-" telescope
-nnoremap <leader>. <cmd>lua require('telescope.builtin').find_files()<cr>
-nnoremap <leader>fg <cmd>lua require('telescope.builtin').live_grep()<cr>
-nnoremap <leader>fb <cmd>lua require('telescope.builtin').buffers()<cr>
-nnoremap <leader>fh <cmd>lua require('telescope.builtin').help_tags()<cr>
-
-" cmake bindings
-nmap <leader>cg <Plug>(CMakeGenerate)
-nmap <leader>cb <Plug>(CMakeBuild)
-nmap <leader>ci <Plug>(CMakeInstall)
-nmap <leader>cs <Plug>(CMakeSwitch)
-nmap <leader>cq <Plug>(CMakeClose)
-
-function! s:check_back_space() abort
-  let col = col('.') - 1
-  return !col || getline('.')[col - 1]  =~# '\s'
-endfunction
-
-" NERDTree 
-nnoremap <C-n> :NvimTreeToggle<CR>
-nnoremap <leader>r :NvimTreeRefresh<CR>
-nnoremap <leader>n :NvimTreeFindFile<CR>
-
-" Only do this part when compiled with support for autocommands.
-if has("autocmd")
-    " Use filetype detection and file-based automatic indenting.
-    filetype plugin indent on
-
-    " Use actual tab chars in Makefiles.
-    autocmd FileType make set tabstop=8 shiftwidth=8 softtabstop=0 noexpandtab
-endif
-
-" For everything else, use a tab width of 4 space chars.
-set tabstop=4       " The width of a TAB is set to 4.
-                    " Still it is a \t. It is just that
-                    " Vim will interpret it to be having
-                    " a width of 4.
-set shiftwidth=4    " Indents will have a width of 4.
-set softtabstop=4   " Sets the number of columns for a TAB.
-set expandtab       " Expand TABs to spaces.g
-
-lua << EOF
-local use = require('packer').use
 require('packer').startup(function()
+   local use = require('packer').use --silences warnings
    use 'junegunn/fzf.vim'
    use 'junegunn/vim-easy-align'
    use 'navarasu/onedark.nvim'
    use 'nvim-lualine/lualine.nvim'
    use 'nvim-lua/plenary.nvim'
    use 'nvim-telescope/telescope.nvim'
-   use 'kyazdani42/nvim-web-devicons' 
+   use 'kyazdani42/nvim-web-devicons'
    use 'kyazdani42/nvim-tree.lua'
    use 'akinsho/bufferline.nvim'
    use 'liuchengxu/vim-which-key'
@@ -69,6 +25,48 @@ require('packer').startup(function()
    use 'cdelledonne/vim-cmake'
 end)
 
+-- set the path to the sumneko installation;
+local sumneko_root_path = vim.fn.stdpath('cache')..'/lspconfig/sumneko_lua/lua-language-server'
+local sumneko_binary = '/usr/bin/lua-language-server'
+local runtime_path = vim.split(package.path, ';')
+table.insert(runtime_path, "lua/?.lua")
+table.insert(runtime_path, "lua/?/init.lua")
+
+require'lspconfig'.sumneko_lua.setup {
+  cmd = { sumneko_binary, "-E", sumneko_root_path .. "/main.lua"};
+  settings = {
+    Lua = {
+      runtime = {
+        -- Tell the language server which version of Lua you're using (most likely LuaJIT in the case of Neovim)
+        version = 'LuaJIT',
+        -- Setup your lua path
+        path = runtime_path,
+      },
+      diagnostics = {
+        -- Get the language server to recognize the `vim` global
+        globals = {'vim'},
+      },
+      workspace = {
+        -- Make the server aware of Neovim runtime files
+        library = vim.api.nvim_get_runtime_file("", true),
+      },
+      -- Do not send telemetry data containing a randomized but unique identifier
+      telemetry = {
+        enable = false,
+      },
+    },
+  },
+}
+-- Tabs
+vim.o.tabstop = 4       -- The width of a TAB is set to 4.
+                        -- Still it is a \t. It is just that
+                        -- Vim will interpret it to be having
+                        -- a width of 4.
+vim.o.shiftwidth = 4    -- Indents will have a width of 4.
+vim.o.softtabstop = 4   -- Sets the number of columns for a TAB.
+vim.o.expandtab = true  -- Expand TABs to spaces.g
+
+
 vim.o.termguicolors = true
 vim.o.number = true -- Print line numbers
 vim.o.updatetime = 300
@@ -83,6 +81,29 @@ vim.g.onedark_toggle_style_keymap = '<leader>tc'
 
 vim.g.vimspector_enable_mappings = 'HUMAN'
 
+local map = vim.api.nvim_set_keymap
+
+-- WhickKey bindings
+map('n', '<leader>', '<cmd>WhichKey \'<Space>\'<cr>', { noremap = true, silent = true })
+
+-- Telescope bindings
+map('n', '<leader>.', '<cmd>lua require(\'telescope.builtin\').find_files()<cr>', { noremap = true })
+map('n', '<leader>fg', '<cmd>lua require(\'telescope.builtin\').live_grep()<cr>', { noremap = true })
+map('n', '<leader>fb', '<cmd>lua require(\'telescope.builtin\').buffers()<cr>', { noremap = true })
+map('n', '<leader>fh', '<fmd>lua require(\'telescope.builtin\').help_tags()<cr>', { noremap = true })
+
+-- NVimTree bindings
+map('n', '<C-n>', '<cmd>NvimTreeToggle<cr>', { noremap = true })
+map('n', '<leader>r', '<cmd>NvimTreeRefresh<cr>', { noremap = true })
+map('n', '<leader>n', '<cmd>NvimTreeFindFile<cr>', { noremap = true })
+
+-- Cmake bindings
+map('n', '<leader>cg', '<Plug>(CMakeGenerate)', {})
+map('n', '<leader>cb', '<Plug>(CMakeBuild)', {})
+map('n', '<leader>ci', '<Plug>(CMakeInstall)', {})
+map('n', '<leader>cs', '<Plug>(CMakeSwitch)', {})
+map('n', '<leader>cq', '<Plug>(CMakeClose)', {})
+
 -- Add additional capabilities supported by nvim-cmp
 local capabilities = vim.lsp.protocol.make_client_capabilities()
 capabilities = require('cmp_nvim_lsp').update_capabilities(capabilities)
@@ -90,7 +111,7 @@ capabilities = require('cmp_nvim_lsp').update_capabilities(capabilities)
 local lspconfig = require('lspconfig')
 
 -- Enable some language servers with the additional completion capabilities offered by nvim-cmp
-local servers = { 'clangd', 'hls', 'cmake', 'sumneko_lua', 'html', 'bashls', 'vimls' }
+local servers = { 'clangd', 'hls', 'cmake', 'html', 'bashls', 'vimls' }
 for _, lsp in ipairs(servers) do
   lspconfig[lsp].setup {
     -- on_attach = my_custom_on_attach,
@@ -255,4 +276,3 @@ require'lualine'.setup {
   extensions = {}
 }
 
-EOF
