@@ -23,6 +23,7 @@ require('packer').startup(function()
    use 'saadparwaiz1/cmp_luasnip' -- Snippets source for nvim-cmp
    use 'L3MON4D3/LuaSnip' -- Snippets plugin
    use 'cdelledonne/vim-cmake'
+   use 'Olical/conjure'
 end)
 
 -- set the path to the sumneko installation;
@@ -258,7 +259,7 @@ require'lualine'.setup {
   sections = {
     lualine_a = {'mode'},
     lualine_b = {'branch', 'diff',
-                  {'diagnostics', sources={'nvim_lsp', 'coc'}}},
+                  {'diagnostics', sources={'nvim_diagnostic', 'coc'}}},
     lualine_c = {'filename'},
     lualine_x = {'encoding', 'fileformat', 'filetype'},
     lualine_y = {'progress'},
